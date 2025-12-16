@@ -110,7 +110,7 @@ def comment_like_click(driver):
     print('좋아요 댓글 누르기 작업을 완료했습니다!')
     
 # 메인함수
-def main(login_ID, login_pass):
+def main(url, login_ID, login_pass):
     try:
         options = Options()
         # options.add_argument("user-data-dir=C:\\Users\\choi heung ki\\Desktop\\ytlogin")
@@ -123,9 +123,8 @@ def main(login_ID, login_pass):
         print(f"오류: {e}")
         sys.exit(1)
 
-    input_url = input('URL을 입력하세요: ')
     # https://www.youtube.com/watch?v=LZP-Gk1B7x8
-    open_url(driver, input_url)
+    open_url(driver, url)
     time.sleep(1)
 
     login(driver, login_ID, login_pass)
@@ -141,4 +140,7 @@ def main(login_ID, login_pass):
     
 # 실행하는 모듈이 import 되지 않고 본 모듈이라면
 if __name__ == "__main__":
-    main(input_ID, input_PASS)
+    input_url = input('URL을 입력하세요: ')
+    input_ID = input('ID를 입력하세요: ')
+    input_PASS = input('password를 입력하세요: ')
+    main(input_url, input_ID, input_PASS)

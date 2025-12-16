@@ -107,7 +107,7 @@ def comment_crolling(driver):
         print(f'파일 저장 중 오류 발생: {e}')
     
 # 메인 함수
-def main():
+def main(url):
     try:
         # 최신 ChromeDriver 설치 및 사용
         service = Service(ChromeDriverManager().install())
@@ -117,8 +117,7 @@ def main():
         print(f"오류: {e}")
         sys.exit(1)
 
-    input_url = input("URL을 입력하세요: ")
-    open_url(driver, input_url)
+    open_url(driver, url)
     time.sleep(1)
 
     unlimit_scrolling(driver)
@@ -131,6 +130,7 @@ def main():
 
 # 실행하는 모듈이 import 되지 않고 본 모듈이라면
 if __name__ == "__main__":
-    main()
+    input_url = input("URL을 입력하세요: ")
+    main(input_url)
 
 
