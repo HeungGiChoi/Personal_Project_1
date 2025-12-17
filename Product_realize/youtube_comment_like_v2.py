@@ -110,7 +110,7 @@ def comment_like_click(driver):
     print('좋아요 댓글 누르기 작업을 완료했습니다!')
     
 # 메인함수
-def main(url, login_ID, login_pass):
+def main(url, login_ID, login_pass, callback_func):
     try:
         options = Options()
         # options.add_argument("user-data-dir=C:\\Users\\choi heung ki\\Desktop\\ytlogin")
@@ -135,6 +135,8 @@ def main(url, login_ID, login_pass):
 
     comment_like_click(driver)
     time.sleep(1)
+
+    callback_func('완료화면')
 
     driver.quit()
     

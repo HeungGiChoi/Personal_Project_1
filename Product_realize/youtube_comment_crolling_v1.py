@@ -8,6 +8,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 
+
 # url로 웹 페이지 열기
 def open_url(driver, url):
     try:
@@ -107,7 +108,7 @@ def comment_crolling(driver):
         print(f'파일 저장 중 오류 발생: {e}')
     
 # 메인 함수
-def main(url):
+def main(url, callback_func):
     try:
         # 최신 ChromeDriver 설치 및 사용
         service = Service(ChromeDriverManager().install())
@@ -126,8 +127,10 @@ def main(url):
     comment_crolling(driver)
     time.sleep(1)
 
-    driver.quit()
+    callback_func('완료화면')
 
+    driver.quit()
+    
 # 실행하는 모듈이 import 되지 않고 본 모듈이라면
 if __name__ == "__main__":
     input_url = input("URL을 입력하세요: ")
