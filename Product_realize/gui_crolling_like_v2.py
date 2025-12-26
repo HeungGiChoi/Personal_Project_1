@@ -11,39 +11,32 @@ frame_dict = {}
 
 # 초기화 + 첫번째 화면
 class FirstFrame():
-    root = tk.Tk()
-
     def __init__(self, items, frame_li, frame_dict):
         # 기본 tk 객체 생성
-        self.items = items
-        self.frame_dict = frame_dict
+        self.root = tk.Tk()
         self.root.title('유튜브 댓글 크롤링 / 좋아요 click')
         self.root.geometry('400x200+600+200')
+        self.items = items
+        self.frame_dict = frame_dict
+        self.frame_li = frame_li
 
         # 컨테이너 생성
-        container = tk.Frame(self.root)
-        container.pack(side='top', fill='both', expand='True')
+        self.container = tk.Frame(self.root)
+        self.container.pack(side='top', fill='both', expand='True')
 
-        container.grid_rowconfigure(0, weight=1)
-        container.grid_columnconfigure(0, weight=1)
+        self.container.grid_rowconfigure(0, weight=1)
+        self.container.grid_columnconfigure(0, weight=1)
 
-        for i in frame_li:
-            self.frame_dict[i] = tk.Frame(container)
+        for i in self.frame_li:
+            self.frame_dict[i] = tk.Frame(self.container)
         
         for i in self.frame_dict:
             self.frame_dict[i].grid(row=0, column=0, sticky='nsew')
+        
+        self.ComboBox()
 
-    # 초기화면
-    def ComboBox(self):
-        combobox = ttk.Combobox(self.frame_dict[0], width=20, height=15, values=self.items)
-        combobox.set('메뉴를 선택하세요')
-        combobox.pack(pady=20)
+        self.root.mainloop()
 
-        button = tk.Button(self.frame_dict[0], text='다음', padx=7, pady=5, command=lambda:self.change_frame(combobox.get()))
-        button.pack()
-
-        self.frame_dict[0].tkraise()
-    
     # 옵션에 따른 frame 전환
     def change_frame(self, option):
         if option in self.frame_dict:
@@ -52,10 +45,83 @@ class FirstFrame():
             show_frame.tkraise()
         else:
             print('선택된 값은 존재하지 않습니다.')
-    
-    root.mainloop()
+
+    # 초기화면
+    def ComboBox(self):
+        self.combobox = ttk.Combobox(self.frame_dict[self.frame_li[0]], width=20, height=15, values=self.items)
+        self.combobox.set('메뉴를 선택하세요')
+        self.combobox.pack(pady=20)
+
+        self.button = tk.Button(self.frame_dict[self.frame_li[0]], text='다음', padx=7, pady=5, command=lambda:self.change_frame(self.combobox.get()))
+        self.button.pack()
+
+        self.frame_dict[self.frame_li[0]].tkraise()
 
 
-FirstFrame(items, frame_li, frame_dict)
-FirstFrame.ComboBox()
+class CommentCrolling(FirstFrame):
+    def __init__(self, items, frame_li, frame_dict):
+        super().__init__(items, frame_li, frame_dict)
+        self.label = tk.Label(self.frame_dict['유튜브 댓글 크롤링'], text='URL을 입력하세요')
+        self.label.pack()
+        self.entry = tk.Entry(self.frame_dict['유튜브 댓글 크롤링'], width=50)
+        self.entry.pack()
 
+        self.btn_click()
+
+    def btn_click(self):
+        self.button = tk.Button(self.frame_dict['유튜브 댓글 크롤링'], text='크롤링 실행', padx=15, pady=5, command=lambda:self.crolling_FrameChange(self.entry.get()))
+        self.button.pack()
+
+    # 크롤링 + 화면전환
+    def crolling_FrameChange(self, entry):
+        self.change_frame('대기화면')
+
+        # threading으로 selenium 작업 진행
+        t = threading.Thread(target=youtube_comment_crolling_v1.main, args=(entry, self.change_frame))
+        t.start()
+
+class CommentLike(FirstFrame):
+    # 댓글 좋아요 화면
+    def comment_like_frame(self):
+        tk.Label(self.frame_dict['유튜브 댓글 좋아요'], text='ID, password, URL을 입력하세요').grid(row=0, column=0, columnspan=2, pady=10)
+        label1 = tk.Label(self.frame_dict['유튜브 댓글 좋아요'], text='ID: ')
+        label1.grid(row=1, column=0, sticky='w', padx=10, pady=5)
+        entry1 = tk.Entry(self.frame_dict['유튜브 댓글 좋아요'], width=20)
+        entry1.grid(row=1, column=1, sticky='w', padx=10, pady=5)
+
+        label2 = tk.Label(self.frame_dict['유튜브 댓글 좋아요'], text='PASS: ')
+        label2.grid(row=2, column=0, sticky='w', padx=10, pady=5)
+        entry2 = tk.Entry(self.frame_dict['유튜브 댓글 좋아요'], width=20)
+        entry2.grid(row=2, column=1, sticky='w', padx=10, pady=5)
+
+        label3 = tk.Label(self.frame_dict['유튜브 댓글 좋아요'], text='URL: ')
+        label3.grid(row=3, column=0, sticky='w', padx=10, pady=5)
+        entry3 = tk.Entry(self.frame_dict['유튜브 댓글 좋아요'], width=50)
+        entry3.grid(row=3, column=1, sticky='ew', padx=10, pady=5)
+
+        self.frame_dict['유튜브 댓글 좋아요'].grid_columnconfigure(1, weight=1)
+
+    def btn_click(self):
+        button = tk.Button(self.frame_dict['유튜브 댓글 좋아요'], text='좋아요 누르기 실행', padx=15, pady=5, command=lambda:self.like_FrameChange(self.entry3.get(), self.entry1.get(), self.entry2.get()))
+        button.grid(row=4, column=1, sticky='w', pady=10)
+
+    # 댓글 좋아요 + 화면전환
+    def like_FrameChange(self, entry_url, entry_ID, entry_PASS):
+        self.change_frame('대기화면')
+
+        # threading으로 selenium 작업 진행
+        t = threading.Thread(target=youtube_comment_like_v2.main, args=(entry_url, entry_ID, entry_PASS, self.change_frame))
+        t.start()
+
+class Wait_Complete(FirstFrame):
+    # 대기화면
+    def phose_frame(self):
+        label_phose = tk.Label(self.frame_dict['대기화면'], text='작업 진행중...')
+        label_phose.pack(pady=50)
+
+    # 완료 화면
+    def complete_frame(self):
+        label_complete = tk.Label(self.frame_dict['완료화면'], text='작업이 완료되었습니다! ')
+        label_complete.pack(pady=50)
+
+application = CommentCrolling(items, frame_li, frame_dict)
