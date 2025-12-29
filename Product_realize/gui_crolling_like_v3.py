@@ -1,6 +1,6 @@
 from tkinter import ttk
 import tkinter as tk
-import youtube_comment_crolling_v1, youtube_comment_like_v2
+from Product_realize import youtube_comment_crolling_v1, youtube_comment_like_v2
 import threading
 
 # 콤보박스 목록
